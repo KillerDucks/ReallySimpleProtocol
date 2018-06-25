@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 #include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
 
 namespace ReallySimpleProtocol 
 {
@@ -33,17 +36,19 @@ namespace ReallySimpleProtocol
 		~Packet();
 
 		// Flag Checks / Debug
-		int FlagDebug(PacketFlags::Flags flags);
+		int FlagDebugSum(PacketFlags::Flags flags);
+		std::string FlagsString(PacketFlags::Flags flags);
 		int FlagDebug(PacketFlags::Flags flags, int expectedSum);
 
 		// Packet Size Calc
 		int CalcPacketSize(std::string data, double &length);
-		bool ValidatePacketSize(DataPacket data, int calcSize);
+		bool ValidatePacketSize(DataPacket data, int calcSize); // Not needed as extra data is padded
 
-		// Packet Creation
+		// Packet Struct Creation
 		DataPacket CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData);
 
 		// Prepare packet transport
+		//std::vector<bool> SendPackets(std::vector<DataPacket>, //SourceIP, //DestIP);
 	};
 }
 

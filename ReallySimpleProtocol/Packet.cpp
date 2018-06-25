@@ -11,36 +11,41 @@ namespace ReallySimpleProtocol
 	{
 	}
 
-	int Packet::FlagDebug(PacketFlags::Flags flags)
+	int Packet::FlagDebugSum(PacketFlags::Flags flags) 
 	{
+		return flags;
+	}
+
+	std::string Packet::FlagsString(PacketFlags::Flags flags)
+	{
+		std::stringstream flagString;
 
 		if (flags & ReallySimpleProtocol::Packet::PacketFlags::SecureData)
 		{
-			printf_s("Secure Data -> Set!\n");
+			flagString << "Secure Data -> Set!";
 		}
 		if (flags & ReallySimpleProtocol::Packet::PacketFlags::SecureTransport)
 		{
-			printf_s("Secure Transport -> Set!\n");
+			flagString << "Secure Transport -> Set! ";
 		}
 		if (flags & ReallySimpleProtocol::Packet::PacketFlags::NullData)
 		{
-			printf_s("Null Data -> Set!\n");
+			flagString << "Null Data -> Set! ";
 		}
 		if (flags & ReallySimpleProtocol::Packet::PacketFlags::TestFlag)
 		{
-			printf_s("Test Flag -> Set!\n");
+			flagString << "Test Flag -> Set! ";
 		}
 		if (flags & ReallySimpleProtocol::Packet::PacketFlags::InitialHandshake)
 		{
-			printf_s("Initial Handshake -> Set!\n");
+			flagString << "Initial Handshake -> Set! ";
 		}
 		if (flags & ReallySimpleProtocol::Packet::PacketFlags::StartOfData)
 		{
-			printf_s("Start Of Data -> Set!\n");
+			flagString << "Start Of Data -> Set! ";
 		}
 
-		printf_s("Flags Sum -> %d \n", flags);
-		return flags;
+		return flagString.str();
 
 	}
 
@@ -91,6 +96,7 @@ namespace ReallySimpleProtocol
 
 	Packet::DataPacket Packet::CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData)
 	{
+		// TODO: need to add validation to inputs
 		Packet::DataPacket tmpPacket;
 		tmpPacket.data = packetData;
 		tmpPacket.packetLength = packetLength;
