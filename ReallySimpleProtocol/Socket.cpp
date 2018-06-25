@@ -11,7 +11,7 @@ namespace ReallySimpleProtocolServer
 	{
 	}
 
-	void SocketServer::StartServer()
+	int SocketServer::StartServer()
 	{
 		WSADATA wsaData;
 		int iResult;
@@ -30,7 +30,7 @@ namespace ReallySimpleProtocolServer
 		iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		if (iResult != 0) {
 			printf("WSAStartup failed with error: %d\n", iResult);
-			//return 1; // TODO: Error Handling
+			return 1; // TODO: Error Handling
 		}
 
 		ZeroMemory(&hints, sizeof(hints));
@@ -44,7 +44,7 @@ namespace ReallySimpleProtocolServer
 		if (iResult != 0) {
 			printf("getaddrinfo failed with error: %d\n", iResult);
 			WSACleanup();
-			//return 1;
+			return 1;
 		}
 
 		// Create a SOCKET for connecting to server
@@ -53,7 +53,7 @@ namespace ReallySimpleProtocolServer
 			printf("socket failed with error: %ld\n", WSAGetLastError());
 			freeaddrinfo(result);
 			WSACleanup();
-			//return 1;
+			return 1;
 		}
 
 		// Setup the TCP listening socket
@@ -63,7 +63,7 @@ namespace ReallySimpleProtocolServer
 			freeaddrinfo(result);
 			closesocket(ListenSocket);
 			WSACleanup();
-			//return 1;
+			return 1;
 		}
 
 		freeaddrinfo(result);
@@ -73,7 +73,7 @@ namespace ReallySimpleProtocolServer
 			printf("listen failed with error: %d\n", WSAGetLastError());
 			closesocket(ListenSocket);
 			WSACleanup();
-			//return 1;
+			return 1;
 		}
 
 		// Accept a client socket
@@ -82,7 +82,7 @@ namespace ReallySimpleProtocolServer
 			printf("accept failed with error: %d\n", WSAGetLastError());
 			closesocket(ListenSocket);
 			WSACleanup();
-			//return 1;
+			return 1;
 		}
 
 		// No longer need server socket
@@ -93,15 +93,19 @@ namespace ReallySimpleProtocolServer
 
 			iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 			if (iResult > 0) {
-				printf("Bytes received: %d\n", iResult);
+				// Debug Printing
+				//printf("Bytes received: %d\n", iResult);
+				//printf("Bytes received (recvbuf): %d\n", recvbuflen); // Looks like the data in is padded out to DEFAULT_BUFLEN (512)
+				//printf("Data Returned: %s\n", recvbuf);
 
+				this->RemovePadding((char *)recvbuf, iResult); // Remove the extra scrambled data
 				// Echo the buffer back to the sender
 				iSendResult = send(ClientSocket, recvbuf, iResult, 0);
 				if (iSendResult == SOCKET_ERROR) {
 					printf("send failed with error: %d\n", WSAGetLastError());
 					closesocket(ClientSocket);
 					WSACleanup();
-					//return 1;
+					return 1;
 				}
 				printf("Bytes sent: %d\n", iSendResult);
 			}
@@ -111,7 +115,7 @@ namespace ReallySimpleProtocolServer
 				printf("recv failed with error: %d\n", WSAGetLastError());
 				closesocket(ClientSocket);
 				WSACleanup();
-				//return 1;
+				return 1;
 			}
 
 		} while (iResult > 0);
@@ -122,14 +126,27 @@ namespace ReallySimpleProtocolServer
 			printf("shutdown failed with error: %d\n", WSAGetLastError());
 			closesocket(ClientSocket);
 			WSACleanup();
-			//return 1;
+			return 1;
 		}
 
 		// cleanup
 		closesocket(ClientSocket);
 		WSACleanup();
 
-		//return 0;
+		return 0;
 	}
 
+	void SocketServer::RemovePadding(char *buffer, int dataSize)
+	{
+		// Debug printing
+		printf_s("iResult Value (Bytes) -> %d\n", dataSize); // Shows actual size of sent data not including the scrambled chars
+		printf_s("Whole Buffer (untouched) -> %s\n", buffer); // Prints all of the buffer %s means its a null terminated string
+
+		// Manipulate the null term string
+		SocketData socketData; // Create a new struct for the buffer
+		memset(socketData.buffer, 0x00, sizeof(socketData.buffer)); // Zero out all of the data in the struct buffer
+		memcpy(socketData.buffer, buffer, dataSize); // Copy only the data into the buffer
+		printf_s("Modified Buffer -> %s\n", socketData.buffer); // Prints out just the info sent by the client
+		printf_s("Modified Buffer Size (Bytes) -> %d\n", sizeof(socketData.buffer));
+	}
 }

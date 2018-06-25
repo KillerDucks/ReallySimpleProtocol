@@ -8,6 +8,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <vector>
+#include <iostream>
+#include <iterator>
+
 // Need to link with Ws2_32.lib
 #pragma comment (lib, "Ws2_32.lib")
 // #pragma comment (lib, "Mswsock.lib")
@@ -17,13 +21,24 @@
 
 namespace ReallySimpleProtocolServer
 {
-	class SocketServer
+	class __declspec(dllexport) SocketServer
 	{
 	public:
 		SocketServer();
 		~SocketServer();
 
-		void StartServer();
+		// Server Start
+		int StartServer();
+
+		// Buffer Manip
+		static void RemovePadding(char *buffer, int dataSize);
+
+		// Test Struct
+
+		struct SocketData
+		{
+			char buffer[128];
+		};
 	};
 }
 
