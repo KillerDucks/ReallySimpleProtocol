@@ -94,13 +94,24 @@ namespace ReallySimpleProtocol
 		return false;
 	}
 
-	Packet::DataPacket Packet::CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData)
+	Packet::DataPacket Packet::CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData, IPv4Address sourceIP, IPv4Address destIP)
 	{
 		// TODO: need to add validation to inputs
 		Packet::DataPacket tmpPacket;
 		tmpPacket.data = packetData;
 		tmpPacket.packetLength = packetLength;
 		tmpPacket.flags = packetFlags;
+		tmpPacket.SourceIP = sourceIP;
+		tmpPacket.DestIP = destIP;
 		return tmpPacket;
+	}
+	char* Packet::ConvertToBytes(DataPacket packet)
+	{
+		// Convert the DataPacket to bytes
+		//char* buffer = reinterpret_cast<char*>(&packet);
+		//char* my_s_bytes = static_cast<char*>(static_cast<void*>(&packet));
+		char buffer[sizeof(packet)];
+		memcpy(buffer, &packet, sizeof(packet));
+		return buffer;
 	}
 }

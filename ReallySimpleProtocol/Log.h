@@ -4,13 +4,14 @@
 
 namespace ReallySimpleProtocol
 {
-	class Log
+	class __declspec(dllexport) Log
 	{
 	public:
 
 		struct LogData
 		{
 			bool SaveToDisk;
+			int timeStamp;
 			std::string Message;
 		};
 

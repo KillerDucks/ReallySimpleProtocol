@@ -21,6 +21,11 @@ using namespace ReallySimpleProtocol;
 
 int __cdecl main(int argc, char **argv)
 {
+	// Debug Struct
+	Packet::DataPacket ds
+	{
+		12, (Packet::PacketFlags::Flags)(Packet::PacketFlags::NullData | Packet::PacketFlags::TestFlag), (char *)"HelloWorld!" , Packet::IPv4Address{ 192,168,0,1 }, Packet::IPv4Address{ 192,168,0,2 }
+	};
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	struct addrinfo *result = NULL,
@@ -88,7 +93,8 @@ int __cdecl main(int argc, char **argv)
 	}
 
 	// Send an initial buffer
-	iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+	//iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
+	iResult = send(ConnectSocket, (char *)&ds, (int)strlen(sendbuf), 0);
 	if (iResult == SOCKET_ERROR) {
 		printf("send failed with error: %d\n", WSAGetLastError());
 		closesocket(ConnectSocket);

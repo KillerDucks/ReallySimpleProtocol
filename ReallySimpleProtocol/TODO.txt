@@ -1,0 +1,14 @@
+// TODO: ReallySimpleProtocol
+
+# Log.cpp
+	- Impliment Simple Logging
+		- Log Packet Info
+			- Secure
+			- Length
+			- Message/Payload
+			- Origin
+			- Source/Dest
+
+# Packet.cpp
+	- Packet
+		- Convert DataPacket into bytes (char *) max length of 512 bytes

@@ -6,11 +6,15 @@
 #include <string>
 #include <sstream>
 
+typedef unsigned char BYTE;
+
 namespace ReallySimpleProtocol 
 {
 	class __declspec(dllexport) Packet
 	{
 	public:
+
+		static const int PACKET_MAX_SIZE = 512;
 
 		struct PacketFlags
 		{
@@ -25,11 +29,22 @@ namespace ReallySimpleProtocol
 			};
 		};
 
+		struct IPv4Address
+		{
+			BYTE b0; 
+			BYTE b1;
+			BYTE b2;
+			BYTE b3;
+		};
+
+
 		struct DataPacket
 		{
 			int packetLength;
 			PacketFlags::Flags flags;
 			std::string data;
+			IPv4Address SourceIP;
+			IPv4Address DestIP;
 		};
 
 		Packet();
@@ -45,10 +60,10 @@ namespace ReallySimpleProtocol
 		bool ValidatePacketSize(DataPacket data, int calcSize); // Not needed as extra data is padded
 
 		// Packet Struct Creation
-		DataPacket CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData);
+		DataPacket CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData, IPv4Address sourceIP, IPv4Address destIP);
 
 		// Prepare packet transport
-		//std::vector<bool> SendPackets(std::vector<DataPacket>, //SourceIP, //DestIP);
+		char* ConvertToBytes(DataPacket packet);
 	};
 }
 
