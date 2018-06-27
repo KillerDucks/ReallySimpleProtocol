@@ -99,6 +99,7 @@ namespace ReallySimpleProtocolServer
 				//printf("Data Returned: %s\n", recvbuf);
 
 				this->RemovePadding((char *)recvbuf, iResult); // Remove the extra scrambled data
+				this->GetData((char *)recvbuf, iResult); // Convert the buffer to a DataStruct struct
 				// Echo the buffer back to the sender
 				iSendResult = send(ClientSocket, recvbuf, iResult, 0);
 				if (iSendResult == SOCKET_ERROR) {
@@ -136,7 +137,7 @@ namespace ReallySimpleProtocolServer
 		return 0;
 	}
 
-	void SocketServer::RemovePadding(char *buffer, int dataSize)
+	SocketServer::SocketData SocketServer::RemovePadding(char *buffer, int dataSize)
 	{
 		// Debug printing
 		printf_s("iResult Value (Bytes) -> %d\n", dataSize); // Shows actual size of sent data not including the scrambled chars
@@ -148,5 +149,23 @@ namespace ReallySimpleProtocolServer
 		memcpy(socketData.buffer, buffer, dataSize); // Copy only the data into the buffer
 		printf_s("Modified Buffer -> %s\n", socketData.buffer); // Prints out just the info sent by the client
 		printf_s("Modified Buffer Size (Bytes) -> %d\n", sizeof(socketData.buffer));
+
+		return socketData;
+	}
+
+	void SocketServer::GetData(char* buffer, int dataSize)
+	{
+		// Debug printing
+		printf_s("iResult Value (Bytes) -> %d\n", dataSize); // Shows actual size of sent data not including the scrambled chars
+
+		// Convert to Struct
+		Packet RCP;
+		char packetBuffer[Packet::PACKET_MAX_SIZE];
+
+		memset(packetBuffer, 0x00, sizeof(packetBuffer)); // Zero out all of the data in the struct buffer
+		memcpy(packetBuffer, buffer, dataSize);
+
+
+		Packet::DataPacket *ds = (Packet::DataPacket *)&packetBuffer;
 	}
 }
