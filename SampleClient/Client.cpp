@@ -21,11 +21,15 @@ using namespace ReallySimpleProtocol;
 
 int __cdecl main(int argc, char **argv)
 {
+	Packet packet;
 	// Debug Struct
-	Packet::DataPacket ds
-	{
-		12, (Packet::PacketFlags::Flags)(Packet::PacketFlags::NullData | Packet::PacketFlags::TestFlag), (char *)"HelloWorld!" , Packet::IPv4Address{ 192,168,0,1 }, Packet::IPv4Address{ 192,168,0,2 }
-	};
+	Packet::DataPacket ds;
+	const char* test = "Hello WorldHello WorldHello WorldHello WorldHell WorldHello WorldHello World";
+	ds = packet.CreatePackets(512, (Packet::PacketFlags::Flags)(Packet::PacketFlags::NullData | Packet::PacketFlags::TestFlag), (char*)test, Packet::IPv4Address{ 192,168,0,1 }, Packet::IPv4Address{ 192,168,0,2 });
+	char buf[Packet::PACKET_MAX_SIZE];
+	memset(buf, 0x00, 512);
+	memcpy(buf, (void*)packet.ConvertToBytes(ds), sizeof(ds));
+
 	WSADATA wsaData;
 	SOCKET ConnectSocket = INVALID_SOCKET;
 	struct addrinfo *result = NULL,
@@ -94,7 +98,7 @@ int __cdecl main(int argc, char **argv)
 
 	// Send an initial buffer
 	//iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
-	iResult = send(ConnectSocket, (char *)&ds, (int)strlen(sendbuf), 0);
+	iResult = send(ConnectSocket, buf, 512, 0);
 	if (iResult == SOCKET_ERROR) {
 		printf("send failed with error: %d\n", WSAGetLastError());
 		closesocket(ConnectSocket);
