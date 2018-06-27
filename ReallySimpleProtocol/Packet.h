@@ -15,6 +15,7 @@ namespace ReallySimpleProtocol
 	public:
 
 		static const int PACKET_MAX_SIZE = 512;
+		static const int DATA_MAX_SIZE = 128;
 
 		struct PacketFlags
 		{
@@ -37,12 +38,11 @@ namespace ReallySimpleProtocol
 			BYTE b3;
 		};
 
-
 		struct DataPacket
 		{
 			int packetLength;
 			PacketFlags::Flags flags;
-			std::string data;
+			char data[DATA_MAX_SIZE];
 			IPv4Address SourceIP;
 			IPv4Address DestIP;
 		};
@@ -60,10 +60,14 @@ namespace ReallySimpleProtocol
 		bool ValidatePacketSize(DataPacket data, int calcSize); // Not needed as extra data is padded
 
 		// Packet Struct Creation
-		DataPacket CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData, IPv4Address sourceIP, IPv4Address destIP);
+		DataPacket CreatePackets(int packetLength, PacketFlags::Flags packetFlags, char* packetData, IPv4Address sourceIP, IPv4Address destIP);
+		//DataPacket CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData, IPv4Address sourceIP, IPv4Address destIP);
 
 		// Prepare packet transport
 		char* ConvertToBytes(DataPacket packet);
+
+		// Convert Packet to DataStruct
+		// DataPacket ConvertToDataPacket(char* packet);
 	};
 }
 

@@ -89,16 +89,19 @@ namespace ReallySimpleProtocol
 		return packets;
 	}
 
-	bool Packet::ValidatePacketSize(DataPacket data, int calcSize)
+	bool Packet::ValidatePacketSize(struct DataPacket data, int calcSize)
 	{
 		return false;
 	}
 
-	Packet::DataPacket Packet::CreatePackets(int packetLength, PacketFlags::Flags packetFlags, std::string packetData, IPv4Address sourceIP, IPv4Address destIP)
+	struct Packet::DataPacket Packet::CreatePackets(int packetLength, PacketFlags::Flags packetFlags, char* packetData, IPv4Address sourceIP, IPv4Address destIP)
 	{
 		// TODO: need to add validation to inputs
-		Packet::DataPacket tmpPacket;
-		tmpPacket.data = packetData;
+		struct Packet::DataPacket tmpPacket;
+		//tmpPacket.data = packetData;
+		// Debug Test
+		memset(tmpPacket.data, 0x00, 128);
+		memcpy(tmpPacket.data, packetData, (int)strlen(packetData));
 		tmpPacket.packetLength = packetLength;
 		tmpPacket.flags = packetFlags;
 		tmpPacket.SourceIP = sourceIP;
@@ -108,10 +111,12 @@ namespace ReallySimpleProtocol
 	char* Packet::ConvertToBytes(DataPacket packet)
 	{
 		// Convert the DataPacket to bytes
-		//char* buffer = reinterpret_cast<char*>(&packet);
-		//char* my_s_bytes = static_cast<char*>(static_cast<void*>(&packet));
-		char buffer[sizeof(packet)];
+		char buffer[PACKET_MAX_SIZE];
+		memset(buffer, 0x00, PACKET_MAX_SIZE);
 		memcpy(buffer, &packet, sizeof(packet));
+
+		// Debug Convert Back
+		//DataPacket *ds = (DataPacket *)buffer; // Works
 		return buffer;
 	}
 }
